@@ -25,7 +25,7 @@
 # deps from those pre-installed dependencies. It saves few minutes of build time when setup.py changes.
 #
 # If INSTALL_MYSQL_CLIENT is set to false, mysql extra is removed
-#
+#:
 set -euo pipefail
 
 test -v INSTALL_MYSQL_CLIENT
@@ -40,9 +40,10 @@ function install_airflow_from_latest_master() {
     echo Installing airflow from latest master. It is used to cache dependencies
     echo
     if [[ ${INSTALL_MYSQL_CLIENT} != "true" ]]; then
-       AIRFLOW_EXTRAS=${AIRFLOW_EXTRAS/mysql,}
+       #AIRFLOW_EXTRAS=${AIRFLOW_EXTRAS/mysql,}
+       break
     fi
-    # Install latest master set of dependencies using constraints \
+    AIRFLOW_EXTRAS=$(echo "$AIRFLOW_EXTRAS" | sed 's/\x1b\[[0-9;]*[mK]//g')
     pip install ${AIRFLOW_INSTALL_USER_FLAG} \
       "https://github.com/${AIRFLOW_REPO}/archive/${AIRFLOW_BRANCH}.tar.gz#egg=apache-airflow[${AIRFLOW_EXTRAS}]" \
       --constraint "${AIRFLOW_CONSTRAINTS_LOCATION}"

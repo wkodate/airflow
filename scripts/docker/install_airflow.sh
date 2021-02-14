@@ -52,6 +52,7 @@ function install_airflow() {
         echo
         echo Installing all packages with eager upgrade
         echo
+        AIRFLOW_EXTRAS=$(echo "$AIRFLOW_EXTRAS" | sed 's/\x1b\[[0-9;]*[mK]//g')
         # eager upgrade
         pip install ${AIRFLOW_INSTALL_USER_FLAG} --upgrade --upgrade-strategy eager \
             "${AIRFLOW_INSTALLATION_METHOD}[${AIRFLOW_EXTRAS}]${AIRFLOW_INSTALL_VERSION}" \
@@ -73,15 +74,16 @@ function install_airflow() {
         echo
         echo Installing all packages with constraints and upgrade if needed
         echo
+        AIRFLOW_EXTRAS=$(echo "$AIRFLOW_EXTRAS" | sed 's/\x1b\[[0-9;]*[mK]//g')
         pip install ${AIRFLOW_INSTALL_USER_FLAG} ${AIRFLOW_INSTALL_EDITABLE_FLAG} \
-            "${AIRFLOW_INSTALLATION_METHOD}[${AIRFLOW_EXTRAS}]${AIRFLOW_INSTALL_VERSION}" \
+            "${AIRFLOW_INSTALLATION_METHOD}[${AIRFLOW_EXTRAS}]==${AIRFLOW_INSTALL_VERSION}" \
             --constraint "${AIRFLOW_CONSTRAINTS_LOCATION}"
         # make sure correct PIP version is used
         pip install ${AIRFLOW_INSTALL_USER_FLAG} --upgrade "pip==${AIRFLOW_PIP_VERSION}"
         # then upgrade if needed without using constraints to account for new limits in setup.py
-        pip install ${AIRFLOW_INSTALL_USER_FLAG} --upgrade --upgrade-strategy only-if-needed \
+        pip install ${AIRFLOW_INSTALL_USER_FLAG} --use-feature=2020-resolver --upgrade --upgrade-strategy only-if-needed \
             ${AIRFLOW_INSTALL_EDITABLE_FLAG} \
-            "${AIRFLOW_INSTALLATION_METHOD}[${AIRFLOW_EXTRAS}]${AIRFLOW_INSTALL_VERSION}" \
+            "${AIRFLOW_INSTALLATION_METHOD}[${AIRFLOW_EXTRAS}]==${AIRFLOW_INSTALL_VERSION}" \
         # Work around to install azure-storage-blob
         pip uninstall azure-storage azure-storage-blob azure-storage-file --yes
         pip install azure-storage-blob azure-storage-file

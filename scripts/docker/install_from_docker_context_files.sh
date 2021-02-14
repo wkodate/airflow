@@ -39,6 +39,7 @@ function install_airflow_and_providers_from_docker_context_files(){
     reinstalling_apache_airflow_package=$(ls \
         /docker-context-files/apache?airflow?[0-9]*.{whl,tar.gz} 2>/dev/null || true)
     # Add extras when installing airflow
+    AIRFLOW_EXTRAS=$(echo "$AIRFLOW_EXTRAS" | sed 's/\x1b\[[0-9;]*[mK]//g')
     if [[ -n "${reinstalling_apache_airflow_package}" ]]; then
         reinstalling_apache_airflow_package="${reinstalling_apache_airflow_package}[${AIRFLOW_EXTRAS}]"
     fi
